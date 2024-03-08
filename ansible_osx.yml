@@ -60,7 +60,6 @@
           'unzip',
           'zlib',
           'zsh',
-          'pipx',
           'tldr'
         ]
         state: present
@@ -137,11 +136,11 @@
         
     - name: "Setup pipx and venv and atuin"
       shell: |
-        echo "/nalias pip=pipx" >> /Users/{{ lookup('env', 'USER') }}/.zshrc
         echo '/neval "$(atuin init zsh)"' >> /Users/{{ lookup('env', 'USER') }}/.zshrc
+        pip install --user pipx
         pipx ensurepath
         source /Users/{{ lookup('env', 'USER') }}/.zshrc
-        pip install virtualenv
+        pipx install virtualenv
         mkdir /Users/{{ lookup('env', 'USER') }}/venv
 
     - name: Add venv() function to zshrc
