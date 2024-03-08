@@ -137,8 +137,8 @@
         
     - name: "Setup pipx and venv and atuin"
       shell: |
-        echo "alias pip=pipx" >> /Users/{{ lookup('env', 'USER') }}/.zshrc
-        echo 'eval "$(atuin init zsh)"' >> /Users/{{ lookup('env', 'USER') }}/.zshrc
+        echo "/nalias pip=pipx" >> /Users/{{ lookup('env', 'USER') }}/.zshrc
+        echo '/neval "$(atuin init zsh)"' >> /Users/{{ lookup('env', 'USER') }}/.zshrc
         pipx ensurepath
         source /Users/{{ lookup('env', 'USER') }}/.zshrc
         pip install virtualenv
