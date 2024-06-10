@@ -20,6 +20,7 @@
           homebrew/cask-versions,
           thoughtbot/formulae,
           weaveworks/tap,
+          hashicorp/tap
         ]
 
     - name: Install core packages via brew casks
@@ -36,9 +37,9 @@
         - google-chrome
         - iterm2
         - sublime-text
-        - telegram
+        # - telegram
         - visual-studio-code
-        - vlc
+        # - vlc
 
     - name: "Install homebrew packages"
       community.general.homebrew:
@@ -66,7 +67,10 @@
           'zlib',
           'zsh',
           'tldr',
-          'derailed/k9s/k9s'
+          'derailed/k9s/k9s',
+          'kubecm',
+          'spacelift-io/spacelift/spacectl',
+          'hashicorp/tap/vault'
         ]
         state: present
         update_homebrew: yes
@@ -142,18 +146,19 @@
         
     - name: "Setup pipx and venv and atuin"
       shell: |
-        echo '/neval "$(atuin init zsh)"' >> /Users/{{ lookup('env', 'USER') }}/.zshrc
+        echo '/neval "$(atuin init zsh)"/n' >> /Users/{{ lookup('env', 'USER') }}/.zshrc
         pip install --user pipx
         pipx ensurepath
         source /Users/{{ lookup('env', 'USER') }}/.zshrc
         pipx install virtualenv
         mkdir /Users/{{ lookup('env', 'USER') }}/venv
 
+    # AVANT STUFF
     - name: Add venv() function to zshrc
       blockinfile:
         path: "/Users/{{ lookup('env', 'USER') }}/.zshrc"
         block: |
-          venv() {
+          function venv() {
               local env_name="$1"
               local venv_path="$HOME/venv/$env_name"
 
@@ -166,7 +171,83 @@
                   source "$venv_path/bin/activate"
               fi
           }
-      
+
+          alias pip=pip3
+          #AVANT
+          export AD_USERNAME=ayjain25
+          export GLOBAL_VAULT_ADDR=https://vault.services.global.avant.com
+          function vault-global-login {
+            vault_addr=$GLOBAL_VAULT_ADDR
+            export VAULT_ADDR=${vault_addr}
+            vault login -method=ldap username=${AD_USERNAME}
+          }
+
+          # AWS Aliases
+          alias aws-whoami="aws sts get-caller-identity"
+          alias assume-avant-prd-app="source ~/.assume-avant-prd-app.sh"
+          alias assume-avant-prd-ds='source ~/.assume-avant-prd-ds.sh'
+          alias unassume-aws-role='source ~/.unassume-aws-role.sh'
+
+          #EKS Aliases
+          alias kc=kubecm
+          alias list-eks="aws eks list-clusters"
+          alias add-eks="aws eks update-kubeconfig --name "
+
+          #Vault Aliases
+          alias vlogin="vault login -method ldap -no-print"
+
+          #Spacelift aliases
+          alias get-space-stack='export MY_STACK_ID=$(spacectl stack list | fzf | awk -F"|" "{print \$1}" | awk "{\$1=\$1};1")'
+          alias space-stack-lp='spacectl stack local-preview --id $MY_STACK_ID' 
+
+    - name: Add assume-avant-prd files
+      shell:
+        mkdir /Users/{{ lookup('env', 'USER') }}/.assume-avant-prd-app.sh
+        mkdir /Users/{{ lookup('env', 'USER') }}/.assume-avant-prd-ds.sh
+        mkdir /Users/{{ lookup('env', 'USER') }}/.unassume-aws-role.sh
+        
+    - name: Add assume-avant-prd-app.sh
+      blockinfile:
+        path: "/Users/{{ lookup('env', 'USER') }}/.assume-avant-prd-app.sh"
+        block: |
+          #!/bin/bash
+
+          unset AWS_ACCESS_KEY_ID
+          unset AWS_SECRET_ACCESS_KEY
+          unset AWS_SESSION_TOKEN
+
+          CREDS=$(aws sts assume-role --role-arn arn:aws:iam::005228414382:role/OrganizationAccountAccessRole --role-session-name OrganizationRole --query "Credentials.[AccessKeyId,SecretAccessKey,SessionToken]" --output text)
+
+          export AWS_ACCESS_KEY_ID=$(echo ${CREDS}| cut -f1 -d$'\t')
+          export AWS_SECRET_ACCESS_KEY=$(echo ${CREDS}| cut -f2 -d$'\t')
+          export AWS_SESSION_TOKEN=$(echo ${CREDS}| cut -f3 -d$'\t')
+
+    - name: Add assume-avant-prd-ds.sh
+      blockinfile:
+        path: "/Users/{{ lookup('env', 'USER') }}/.assume-avant-prd-ds.sh"
+        block: |
+          #!/bin/bash
+
+          unset AWS_ACCESS_KEY_ID
+          unset AWS_SECRET_ACCESS_KEY
+          unset AWS_SESSION_TOKEN
+
+          CREDS=$(aws sts assume-role --role-arn arn:aws:iam::654641313688:role/OrganizationAccountAccessRole --role-session-name OrganizationRole --query "Credentials.[AccessKeyId,SecretAccessKey,SessionToken]" --output text)
+
+          export AWS_ACCESS_KEY_ID=$(echo ${CREDS}| cut -f1 -d$'\t')
+          export AWS_SECRET_ACCESS_KEY=$(echo ${CREDS}| cut -f2 -d$'\t')
+          export AWS_SESSION_TOKEN=$(echo ${CREDS}| cut -f3 -d$'\t')
+    
+    - name: Add unassume-aws-role.sh
+      blockinfile:
+        path: "/Users/{{ lookup('env', 'USER') }}/.unassume-aws-role.sh"
+        block: |
+          #!/bin/bash
+
+          unset AWS_ACCESS_KEY_ID
+          unset AWS_SECRET_ACCESS_KEY
+          unset AWS_SESSION_TOKEN
+
     - name: Create ssh key for github
       shell: |
         mkdir /Users/{{ lookup('env', 'USER') }}/.ssh
