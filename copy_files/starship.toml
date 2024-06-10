@@ -1,0 +1,117 @@
+# ~/.config/starship.toml
+
+format = """
+$username\
+$directory\
+$git_branch\
+$git_commit\
+$git_state\
+$git_metrics\
+$git_status\
+$python\
+$all
+"""
+
+# Displays text, typically a single character,
+# based on the status of the previous command.
+[character]
+success_symbol = "[❯](fg:#83DCC8)" # normal prompt
+error_symbol = "[✗](bold red)"     # used if previous command failed
+
+[aws]
+format = ' [$symbol($profile )(\($region\))]($style)'
+style = "bold blue"
+symbol = " "
+
+[cmd_duration]
+min_time = 5_000                     # Show command duration over 5,000 milliseconds (=5 sec)
+format = " took [$duration]($style)"
+
+[directory]
+truncation_length = 10
+format = "[$path]($style)[$lock_symbol]($lock_style) "
+
+[docker_context]
+format = "via [🐋 $context](blue bold)"
+
+[git_branch]
+format = " [$symbol](bold purple)[$branch]($style) "
+symbol = " "
+#symbol = "🌱 " 
+style = "fg:#83DCC8"
+
+[git_commit]
+commit_hash_length = 8
+style = "bold white"
+
+[git_state]
+format = '[\($state( $progress_current of $progress_total)\)]($style) '
+cherry_pick = "[🍒 PICKING](bold red)"
+
+[git_status]
+format = "$all_status$ahead_behind"
+conflicted = "  "
+ahead = "  ×${count}"
+behind = "  ×${count}"
+diverged = "  < ×${ahead_count}  ×${behind_count}>"
+untracked = "  ×${count}"
+stashed = "  ×${count}"
+modified = "  ×${count}"
+staged = "  ×${count}"
+renamed = "   ×${count}"
+deleted = "  ×${count}"
+style = "bright-white"
+
+[hostname]
+ssh_only = true
+ssh_symbol = '🌐 '
+format = '[$ssh_symbol$hostname]($style) in '
+trim_at = "-"
+style = "bold dimmed white"
+disabled = false
+
+[golang]
+format = "via [$symbol($version )]($style)"
+symbol = "[](fg:#03fce8)"
+style = "bold cyan"
+
+[julia]
+format = "[$symbol$version]($style) "
+symbol = "ஃ "
+style = "bold green"
+
+[package]
+disabled = true
+
+#[python]
+#format = '[ via ](dimmed white)[${symbol}(${version})(\($virtualenv\) )]($style)'
+#style = "fg:#83DCC8"
+#python_binary = ["python3", "python"]
+#symbol = "[ ](fg:#3776ab) "                                                      # actual python blue
+
+[rust]
+format = "[$symbol$version]($style) "
+style = "bold green"
+
+[username]
+style_user = "dimmed cyan"
+show_always = true
+
+[custom.zsh]
+when = '[[ ! -n "${VIRTUAL_ENV}" ]]'
+style = "bold red"
+format = '[ 󱔎 NO PYTHON ENVIORNMENT SET ]($style)'
+
+[kubernetes]
+# format = 'on [⛵ ($user on )($cluster in )$context \($namespace\)](dimmed green) '
+format = 'on [⛵ $context ](blue)'
+disabled = false
+
+[[kubernetes.contexts]]
+context_pattern = ".*slice.*"
+context_alias = "LOCAL"
+
+
+[[kubernetes.contexts]]
+context_pattern = "arn:aws:eks:.*"
+context_alias = "EKS"
