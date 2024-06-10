@@ -70,7 +70,8 @@
           'derailed/k9s/k9s',
           'kubecm',
           'spacelift-io/spacelift/spacectl',
-          'hashicorp/tap/vault'
+          'hashicorp/tap/vault',
+          'hashicorp/tap/terraform'
         ]
         state: present
         update_homebrew: yes
