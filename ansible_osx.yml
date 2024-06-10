@@ -67,6 +67,7 @@
           'zlib',
           'zsh',
           'tldr',
+          'starship',
           'derailed/k9s/k9s',
           'kubecm',
           'spacelift-io/spacelift/spacectl',
@@ -145,16 +146,26 @@
         pip3 install ansible
         asdf reshim python
         
-    - name: "Setup pipx and venv and atuin"
+    - name: "Setup pipx and venv and atuin and starship"
       shell: |
-        echo '/neval "$(atuin init zsh)"/n' >> /Users/{{ lookup('env', 'USER') }}/.zshrc
+        echo '/neval "$(atuin init zsh)"/neval "$(starship init zsh)"/nexport STARSHIP_CONFIG=~/.config/starship.toml/n' >> /Users/{{ lookup('env', 'USER') }}/.zshrc
         pip install --user pipx
         pipx ensurepath
         source /Users/{{ lookup('env', 'USER') }}/.zshrc
         pipx install virtualenv
         mkdir /Users/{{ lookup('env', 'USER') }}/venv
+    
+    - name: Copy ~/.config/starship.toml
+      copy:
+        src: copy_files/starship.toml
+        dest: /Users/{{ lookup('env', 'USER') }}/.config/starship.toml
+        owner: "{{ lookup ('env', 'USER') }}"
 
     # AVANT STUFF
+    - name: Make github directory
+      shell: |
+        mkdir /Users/{{ lookup('env', 'USER') }}/Desktop/github
+
     - name: Add venv() function to zshrc
       blockinfile:
         path: "/Users/{{ lookup('env', 'USER') }}/.zshrc"
