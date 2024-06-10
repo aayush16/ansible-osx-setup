@@ -28,6 +28,10 @@
       ignore_errors: yes
       with_items:
         # - datagrip
+        - 1password
+        - slack
+        - zoom
+        - tuple
         - docker
         - google-chrome
         - iterm2
@@ -41,6 +45,7 @@
         name: [
           'autoconf',
           'automake',
+          'aws-iam-authenticator',
           'awscli',
           'atuin',
           'bfg',
@@ -60,7 +65,8 @@
           'unzip',
           'zlib',
           'zsh',
-          'tldr'
+          'tldr',
+          'derailed/k9s/k9s'
         ]
         state: present
         update_homebrew: yes
@@ -167,7 +173,7 @@
         touch /Users/{{ lookup('env', 'USER') }}/.ssh/config
         # DO THE FOLLOWING
         # cd ~/.ssh
-        # ssh-keygen -t ed25519 -C "hunt.woodie@gmail.com"
+        # ssh-keygen -t ed25519 -C "aayush.jain@avant.com"
         # ssh-add --apple-use-keychain ~/.ssh/github
         # pbcopy < ~/.ssh/github.pub 
         # copy the ssh key to github->settings->ssh keys
